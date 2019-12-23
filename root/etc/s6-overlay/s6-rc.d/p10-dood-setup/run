@@ -1,0 +1,15 @@
+#!/usr/bin/with-contenv bash
+set -e
+
+GID_DOCKER="${GID_DOCKER:-$(ls -ldn /var/run/docker.sock 2>/dev/null | awk 'NR==1 {print $4}')}";
+
+if [ -n "${GID_DOCKER}" ]; # update gid of 'docker' if defined
+then
+    if getent group "docker";
+    then groupmod -o -g "${GID_DOCKER}" docker;
+    else groupadd -o -r -g "${GID_DOCKER}" docker;
+    fi
+
+    adduser ${S6_USER:-alpine} docker;
+fi
+
