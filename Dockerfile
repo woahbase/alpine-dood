@@ -20,7 +20,7 @@ RUN set -xe \
         docker-cli \
         # docker-cli-buildx \
         # docker-cli-compose \
-        docker-credential-ecr-login \
+        # docker-credential-ecr-login \
         git \
         # jq \
         make \
