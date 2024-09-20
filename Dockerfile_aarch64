@@ -1,0 +1,42 @@
+ARG DOCKERSRC=frommakefile
+#
+FROM ${DOCKERSRC}
+#
+ARG PUID=1001
+ARG PGID=1001
+#
+ARG USERNAME=alpine
+ENV HOME=/home/${USERNAME}
+#
+RUN set -xe \
+    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
+    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
+    && apk add -Uu --purge --no-cache \
+        musl libstdc++ \
+        curl git make \
+        docker docker-compose ctop \
+    && \
+    # VERSION=$(curl -SL https://api.github.com/repos/docker/compose/releases/latest | awk '/tag_name/{print $4;exit}' FS='[""]' | sed -e 's_v__') \
+    # && echo "using compose version: $VERSION" \
+    # && curl -Lo /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/${VERSION}/docker-compose-Linux-x86_64 \
+    # && chmod a+rx /usr/local/bin/docker-compose \
+    # && \
+    VERSION=$(curl -SL https://api.github.com/repos/docker/machine/releases/latest | awk '/tag_name/{print $4;exit}' FS='[""]') \
+    && echo "using machine version: $VERSION" \
+    && curl -Lo /usr/local/bin/docker-machine https://github.com/docker/machine/releases/download/${VERSION}/docker-machine-Linux-aarch64 \
+    && chmod a+rx /usr/local/bin/docker-machine \
+    && rm -rf /tmp/* /var/cache/apk/*
+#
+RUN set -xe \
+    && addgroup -g ${PGID} -S ${USERNAME} \
+    && adduser -u ${PUID} -G ${USERNAME} -s /bin/bash -h $HOME -D ${USERNAME} \
+    && addgroup ${USERNAME} docker
+#
+# VOLUME /home/${USERNAME}/
+# VOLUME /home/${USERNAME}/project/ # specify at runtime
+#
+# USER ${USERNAME} # specify at runtime
+# WORKDIR /home/${USERNAME}/project/
+#
+ENTRYPOINT ["/bin/bash"]
