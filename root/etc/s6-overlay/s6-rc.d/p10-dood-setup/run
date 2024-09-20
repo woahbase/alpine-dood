@@ -1,15 +1,22 @@
 #!/usr/bin/with-contenv bash
 set -e
 
+vecho () { if [ "${S6_VERBOSITY:-1}" -gt 0 ]; then echo "[$0] $@"; fi; }
+
 GID_DOCKER="${GID_DOCKER:-$(ls -ldn /var/run/docker.sock 2>/dev/null | awk 'NR==1 {print $4}')}";
 
 if [ -n "${GID_DOCKER}" ]; # update gid of 'docker' if defined
 then
     if getent group "docker";
-    then groupmod -o -g "${GID_DOCKER}" docker;
-    else groupadd -o -r -g "${GID_DOCKER}" docker;
+    then
+        vecho "Modifying 'docker' group id to ${GID_DOCKER}";
+        groupmod -o -g "${GID_DOCKER}" docker;
+    else
+        vecho "Adding 'docker' group with gid ${GID_DOCKER}";
+        groupadd -o -r -g "${GID_DOCKER}" docker;
     fi
 
+    vecho "Adding user ${S6_USER} to group 'docker'(${GID_DOCKER})";
     adduser ${S6_USER:-alpine} docker;
 fi
 
