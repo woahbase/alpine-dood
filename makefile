@@ -58,7 +58,7 @@ LABELFLAGS ?= \
 	--label org.opencontainers.image.title=$(REPONAME) \
 	--label org.opencontainers.image.url="$(if $(REGISTRY_URL),$(REGISTRY_URL),https://$(REGISTRY))/$(ORGNAME)/$(REPONAME)" \
 	--label org.opencontainers.image.vendor=$(ORGNAME) \
-	--label org.opencontainers.image.version=$(VERSION) \
+	--label org.opencontainers.image.version=tagged \
 	# --label org.opencontainers.image.authors="$(shell git config --get user.name)($(shell git config --get user.email))" \
 	#
 # all build-time flags combined here
